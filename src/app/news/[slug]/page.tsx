@@ -1,7 +1,30 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { CategoryBadge } from "@/components/CategoryBadge";
+
+const BASE = "https://pixelmind-ai-delta.vercel.app";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await prisma.article.findUnique({ where: { slug } });
+  if (!article) return { title: "Article not found" };
+  return {
+    title: article.title,
+    description: article.excerpt,
+    alternates: { canonical: `${BASE}/news/${slug}` },
+    openGraph: {
+      title: article.title,
+      description: article.excerpt,
+      url: `${BASE}/news/${slug}`,
+      type: "article",
+      publishedTime: article.createdAt.toISOString(),
+      ...(article.image ? { images: [{ url: article.image, width: 800, height: 450 }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title: article.title, description: article.excerpt },
+  };
+}
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -14,7 +37,21 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     take: 3,
   });
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    description: article.excerpt,
+    datePublished: article.createdAt.toISOString(),
+    dateModified: article.updatedAt.toISOString(),
+    publisher: { "@type": "Organization", name: "PixelMind", url: BASE },
+    ...(article.image ? { image: article.image } : {}),
+    ...(article.sourceUrl ? { url: article.sourceUrl } : {}),
+  };
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-text-secondary mb-8">
@@ -96,5 +133,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </section>
       )}
     </div>
+    </>
   );
 }

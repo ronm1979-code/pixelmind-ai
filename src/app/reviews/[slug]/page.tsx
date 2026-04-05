@@ -1,8 +1,30 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { Rating } from "@/components/Rating";
+
+const BASE = "https://pixelmind-ai-delta.vercel.app";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const review = await prisma.review.findUnique({ where: { slug }, include: { tool: true } });
+  if (!review) return { title: "Review not found" };
+  return {
+    title: review.title,
+    description: review.excerpt,
+    alternates: { canonical: `${BASE}/reviews/${slug}` },
+    openGraph: {
+      title: review.title,
+      description: review.excerpt,
+      url: `${BASE}/reviews/${slug}`,
+      type: "article",
+      ...(review.tool.image ? { images: [{ url: review.tool.image, width: 128, height: 128 }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title: review.title, description: review.excerpt },
+  };
+}
 
 export default async function ReviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
