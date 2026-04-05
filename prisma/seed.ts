@@ -1,6 +1,22 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaLibSQL } from "@prisma/adapter-libsql";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 
-const prisma = new PrismaClient();
+// Load .env file manually (tsx env loading is unreliable)
+try {
+  const envContent = readFileSync(resolve(process.cwd(), ".env"), "utf8");
+  for (const line of envContent.split("\n")) {
+    const m = line.match(/^([^=\s#]+)="?([^"]*)"?$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+  }
+} catch {}
+
+const adapter = new PrismaLibSQL({
+  url: process.env.TURSO_DATABASE_URL!,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Seeding PixelMind database...");
