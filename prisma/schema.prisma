@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  image       String?
+  source      String?
+  sourceUrl   String?
+  category    String   @default("general") // models, products, companies, research, industry
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  comments    Comment[]
+}
+
+model Guide {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  image       String?
+  category    String   // text, image, video, code, audio, business
+  toolName    String?  // e.g. "ChatGPT", "Midjourney"
+  difficulty  String   @default("beginner") // beginner, intermediate, advanced
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  comments    Comment[]
+}
+
+model Tool {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  fullDescription String?
+  image       String?
+  category    String   // text, image, video, code, audio, business
+  url         String
+  pricing     String   @default("free") // free, freemium, paid, enterprise
+  rating      Float    @default(0)
+  featured    Boolean  @default(false)
+  tags        String?  // comma-separated
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  reviews     Review[]
+  comments    Comment[]
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  excerpt     String
+  rating      Float
+  pros        String?  // comma-separated
+  cons        String?  // comma-separated
+  toolId      String
+  tool        Tool     @relation(fields: [toolId], references: [id])
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  comments    Comment[]
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  author      String
+  content     String
+  articleId   String?
+  article     Article? @relation(fields: [articleId], references: [id])
+  guideId     String?
+  guide       Guide?   @relation(fields: [guideId], references: [id])
+  toolId      String?
+  tool        Tool?    @relation(fields: [toolId], references: [id])
+  reviewId    String?
+  review      Review?  @relation(fields: [reviewId], references: [id])
+  createdAt   DateTime @default(now())
+}
