@@ -9,9 +9,11 @@
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "agent": "tsx agent/index.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
     "@libsql/client": "^0.17.2",
     "@prisma/adapter-libsql": "^6.19.3",
     "@prisma/client": "^6.19.3",

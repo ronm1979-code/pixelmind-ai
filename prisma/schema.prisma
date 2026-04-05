@@ -18,6 +18,7 @@ model Article {
   sourceUrl   String?
   category    String   @default("general") // models, products, companies, research, industry
   published   Boolean  @default(true)
+  views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   comments    Comment[]
@@ -34,6 +35,7 @@ model Guide {
   toolName    String?  // e.g. "ChatGPT", "Midjourney"
   difficulty  String   @default("beginner") // beginner, intermediate, advanced
   published   Boolean  @default(true)
+  views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   comments    Comment[]
@@ -52,6 +54,7 @@ model Tool {
   rating      Float    @default(0)
   featured    Boolean  @default(false)
   tags        String?  // comma-separated
+  views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   reviews     Review[]

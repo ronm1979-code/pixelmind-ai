@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import type { Metadata } from "next";
+import { ViewTracker } from "@/components/ViewTracker";
 
 const difficultyMap: Record<string, { label: string; class: string }> = {
   beginner:     { label: "Beginner",     class: "bg-green-500/10 text-green-400 border border-green-500/20" },
@@ -32,6 +33,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
   return (
     <div>
+      <ViewTracker type="guide" slug={guide.slug} />
       {/* Hero */}
       <section className="py-12 sm:py-16 border-b border-white/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

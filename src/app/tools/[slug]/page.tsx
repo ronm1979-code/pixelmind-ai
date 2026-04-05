@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { Rating } from "@/components/Rating";
+import { ViewTracker } from "@/components/ViewTracker";
 
 const pricingLabels: Record<string, string> = {
   free: "Free", freemium: "Freemium", paid: "Paid", enterprise: "Enterprise",
@@ -33,6 +34,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div>
+      <ViewTracker type="tool" slug={tool.slug} />
       {/* Hero */}
       <section className="py-12 sm:py-16 border-b border-white/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
